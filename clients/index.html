@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<style>
+    body {
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 0 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 12px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: white;
+        color: black;
+        border: 2px solid #555;
+        padding: 10px 25px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+        height: 500px;
+        overflow: auto;
+    }
+</style>
+
+<body>
+    <h2>Chat</h2>
+
+    <div class="container" id="chat"></div>
+
+    <label for="text">Digite uma mensagem: </label>
+    <input type="text" id="text"></input><br>
+    <button onclick="sendMessage()">Enviar</button>
+</body>
+<script>
+    // Create WebSocket connection.
+    let name = ''
+    while (!name) {
+        name = prompt("digite seu nome")
+        console.log(name)
+    }
+    const socket = new WebSocket('ws://localhost:3000');
+    socket.addEventListener('open', function () {
+        socket.send(name + " entrou");
+    })
+    // Listen for messages
+    socket.addEventListener('message', function (event) {
+        let msg = (event.data);
+        console.log(msg)
+        let textNode = document.createTextNode(msg)
+        let div = document.getElementById("chat")
+        div.appendChild(textNode)
+        div.appendChild(document.createElement("br"))
+        window.scrollTo(0,div.scrollHeight)
+    });
+
+    const sendMessage = () => {
+        let text = document.getElementById('text')
+        let msg = name + ": " + text.value
+
+        socket.send(msg);
+        text.value = "";
+    }
+</script>
+
+</html>
